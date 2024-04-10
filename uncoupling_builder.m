@@ -1,20 +1,20 @@
-function uncoupling_builder(FDG,PTSM)
+function uncoupling_builder(T1,T2)
 % Takes in covariance matrix arrays from outputs of tier1 connectomics
-% analyses of FDG and PTSM data, respectively
-narginchk(2,3)
-[rwF, clF] = size(FDG);
-[rwP, clP] = size(PTSM);
+% analyses of Tracer 1 (T1) and Tracer 2 (T2 )data, respectively and returns connectomic analyses of a 2-tracer coupled covariance matrix
+narginchk(2,2)
+[rwF, clF] = size(T1);
+[rwP, clP] = size(T2);
 % cell structure check variable names in first row col
- FDG_rNames = FDG(:,1);    % row subgroup labels FDG
- FDG_cNames = FDG(1,:);    % column subgroup labels FDG
- PTSM_rNames = PTSM(:,1); % row subgroup labels PTSM
- PTSM_cNames = PTSM(1,:); % column subgroup labels PTSM
+ T1_rNames = T1(:,1);    % row subgroup labels T1
+ T1_cNames = T1(1,:);    % column subgroup labels T1
+ T2_rNames = T2(:,1); % row subgroup labels T2
+ T2_cNames = T2(1,:); % column subgroup labels T2
 
  % there is a +1 for (1,1) which is why most loops start at 2.
- NrF = length(FDG_rNames);       % number of row groupings FDG
- NcF = length(FDG_cNames);       % number of column groupings FDG
- NrP = length(PTSM_rNames);       % number of row groupings PTSM
- NcP = length(PTSM_cNames);       % number of column groupings PTSM
+ NrF = length(T1_rNames);       % number of row groupings T1
+ NcF = length(T1_cNames);       % number of column groupings T1
+ NrP = length(T2_rNames);       % number of row groupings T2
+ NcP = length(T2_cNames);       % number of column groupings T2
 
 if rwF ~= rwP
     fprintf(2,'Number of rows varies between tracers. Check that input cell arrays were made correctly.\n')
@@ -27,39 +27,39 @@ end
 %% Create sex*treatment supermatrices
 for i=2:rwF
     for j=2:clF
-        FDG_data = FDG{i,j};
-        PTSM_data = PTSM{i,j};
-        [region_countF,cohort_countF] = size(FDG_data);
-        [region_countP,cohort_countP] = size(PTSM_data);
+        T1_data = T1{i,j};
+        T2_data = T2{i,j};
+        [region_countF,cohort_countF] = size(T1_data);
+        [region_countP,cohort_countP] = size(T2_data);
         % run mean imputation
         if region_countF == region_countP
             if cohort_countF > cohort_countP
                 for k=1:region_countP
                     for l=cohort_countP:cohort_countF
-                        PTSM_data(k,l) = mean(PTSM_data(k,:));
+                        T2_data(k,l) = mean(T2_data(k,:));
                     end
                 end
-                %PTSM_data(:,end+1:cohort_countF)=missing;
+                %T2_data(:,end+1:cohort_countF)=missing;
                 %super = NaN(2*region_countF,cohort_countF);
             elseif cohort_countP > cohort_countF
                 for m=1:region_countF
                     for n=cohort_countF:cohort_countP
-                        FDG_data(m,n) = mean(FDG_data(m,:));
+                        T1_data(m,n) = mean(T1_data(m,:));
                     end
                 end
-                FDG_data(:,end+1:cohort_countP)=missing;
+                T1_data(:,end+1:cohort_countP)=missing;
                 %super = NaN(2*region_countP,cohort_countP);
             end
         else
             fprintf(2,'Number of regions varies between tracers. Check that nested matrices were made correctly.\n')
         return
         end
-        super{i,j} = [FDG_data; PTSM_data];
+        super{i,j} = [T1_data; T2_data];
         supert = transpose(super{i,j});
         % Initialize the covariance supermatrix
         covariance_supermatrix = zeros(2*region_countF, 2*region_countF);
 
-        % Compute covariances for FDG-PTSM interactions
+        % Compute covariances for T1-T2 interactions
         for o = 1:(region_countF*2)
             for p = 1:(region_countF*2)
                 covariance_supermatrix(o,p) = corr(supert(:,o), supert(:,p),"type","Pearson");
@@ -67,54 +67,54 @@ for i=2:rwF
         end
         uncoupling_supermatrix{i,j} = covariance_supermatrix;
         clear covariance_supermatrix
-        uncoupling_supermatrix{1,j} = FDG{1,j};
+        uncoupling_supermatrix{1,j} = T1{1,j};
         
     end
-    uncoupling_supermatrix{i,1} = FDG{i,1}; 
+    uncoupling_supermatrix{i,1} = T1{i,1}; 
 end
-uncoupling_supermatrix{1,1} = "FDG_PTSM_Supermatrices";
+uncoupling_supermatrix{1,1} = "T1_T2_Supermatrices";
 
 %% Isolate, transform, run connectomics on uncoupling submatrix
 % Isolate uncoupling matrix (quadrants I and III)
 
 % Sizes of the matrices
-rowlim_FDG_FDG = 27;
-collim_FDG_FDG = 27;
-rowlim_PTSM_PTSM = 54;
-collim_PTSM_PTSM = 54;
-rowlim_FDG_PTSM = 54;
-collim_FDG_PTSM = 27;
+rowlim_T1_T1 = 27;
+collim_T1_T1 = 27;
+rowlim_T2_T2 = 54;
+collim_T2_T2 = 54;
+rowlim_T1_T2 = 54;
+collim_T1_T2 = 27;
 
 % Extract the submatrices using specific sizes
 [rw_super, cl_super] = size(uncoupling_supermatrix);
 for i=2:rw_super
     for j=2:cl_super
-        fullsuper = uncoupling_supermatrix{i,j}; FDG_FDG = fullsuper(1:rowlim_FDG_FDG, 1:collim_FDG_FDG);
-        FDG_PTSM = fullsuper(rowlim_FDG_FDG+1:rowlim_FDG_PTSM, 1:collim_FDG_PTSM);
-        PTSM_PTSM = fullsuper(rowlim_FDG_FDG+1:rowlim_PTSM_PTSM, collim_FDG_FDG+1:collim_PTSM_PTSM);
-        FDG_FDG_matrix{i,j} = FDG_FDG; FDG_PTSM_matrix{i,j} = FDG_PTSM; PTSM_PTSM_matrix{i,j} = PTSM_PTSM;
-        FDG_FDG_matrix(1,j) = uncoupling_supermatrix(1,j);FDG_PTSM_matrix(1,j) = uncoupling_supermatrix(1,j); PTSM_PTSM_matrix(1,j) = uncoupling_supermatrix(1,j);
+        fullsuper = uncoupling_supermatrix{i,j}; T1_T1 = fullsuper(1:rowlim_T1_T1, 1:collim_T1_T1);
+        T1_T2 = fullsuper(rowlim_T1_T1+1:rowlim_T1_T2, 1:collim_T1_T2);
+        T2_T2 = fullsuper(rowlim_T1_T1+1:rowlim_T2_T2, collim_T1_T1+1:collim_T2_T2);
+        T1_T1_matrix{i,j} = T1_T1; T1_T2_matrix{i,j} = T1_T2; T2_T2_matrix{i,j} = T2_T2;
+        T1_T1_matrix(1,j) = uncoupling_supermatrix(1,j);T1_T2_matrix(1,j) = uncoupling_supermatrix(1,j); T2_T2_matrix(1,j) = uncoupling_supermatrix(1,j);
     end
-    FDG_FDG_matrix(i,1) = uncoupling_supermatrix(i,1);
-    FDG_PTSM_matrix(i,1) = uncoupling_supermatrix(i,1); FDG_PTSM_matrix{1,1} = "Coupled";
-    PTSM_PTSM_matrix(i,1) = uncoupling_supermatrix(i,1);
+    T1_T1_matrix(i,1) = uncoupling_supermatrix(i,1);
+    T1_T2_matrix(i,1) = uncoupling_supermatrix(i,1); T1_T2_matrix{1,1} = "Coupled";
+    T2_T2_matrix(i,1) = uncoupling_supermatrix(i,1);
 end
 
 % Transform uncoupling matrix
-[rw_uncpld,cl_uncpld] = size(FDG_PTSM_matrix);
+[rw_uncpld,cl_uncpld] = size(T1_T2_matrix);
 for i=2:rw_uncpld
     for j=2:cl_uncpld
-        transformed_uncoupled{i,j} = FDG_PTSM_matrix{i,j}*-1;
-        transformed_uncoupled{1,j} = FDG_PTSM_matrix{1,j};
+        transformed_uncoupled{i,j} = T1_T2_matrix{i,j}*-1;
+        transformed_uncoupled{1,j} = T1_T2_matrix{1,j};
     end
-    transformed_uncoupled{i,1} = FDG_PTSM_matrix{i,1}; transformed_uncoupled{1,1} = "Transformed + Coupled";
+    transformed_uncoupled{i,1} = T1_T2_matrix{i,1}; transformed_uncoupled{1,1} = "Transformed + Coupled";
 end
 %% Run Tier1 Analysis on Uncoupling Matrices
 % Permutation testing of significant edge covariance 
 % 10,000 permutations
-% We use FDG structure, since we have already proven that FDG and PTSM
+% We use T1 structure, since we have already proven that T1 and T2
 % datasets have the same structure
-cov_permP = FDG_rNames;    cov_permP(1,1:NcF) = FDG_cNames;    % permutation p value matrices
+cov_permP = T1_rNames;    cov_permP(1,1:NcF) = T1_cNames;    % permutation p value matrices
 for r=2:NrF % every row
     for c=2:NcF % every column
         [~,~,cov_permP{r,c}] = randshiftnull_cov(super{r,c},10000);
@@ -125,18 +125,18 @@ end
 for i=2:rw_perm
     for j=2:cl_perm
         fullsuper = cov_permP{i,j}; 
-        FDG_PTSM = fullsuper(rowlim_FDG_FDG+1:rowlim_FDG_PTSM, 1:collim_FDG_PTSM);
-        FDG_PTSM_perm_matrix{i,j} = FDG_PTSM;
-        FDG_PTSM_perm_matrix(1,j) = uncoupling_supermatrix(1,j);
+        T1_T2 = fullsuper(rowlim_T1_T1+1:rowlim_T1_T2, 1:collim_T1_T2);
+        T1_T2_perm_matrix{i,j} = T1_T2;
+        T1_T2_perm_matrix(1,j) = uncoupling_supermatrix(1,j);
     end
-    FDG_PTSM_perm_matrix(i,1) = uncoupling_supermatrix(i,1); FDG_PTSM_perm_matrix{1,1} = "Coupled";
+    T1_T2_perm_matrix(i,1) = uncoupling_supermatrix(i,1); T1_T2_perm_matrix{1,1} = "Coupled";
 end
 % Create thresholded covariance matrices
 cnt=0;
 for r=2:Nr
     for c=2:Nc
         cnt=cnt+1;
-        mask = logical(FDG_PTSM_perm_matrix{r,c}>0.05);     % binary mask of NONsignificant edges
+        mask = logical(T1_T2_perm_matrix{r,c}>0.05);     % binary mask of NONsignificant edges
         mat = transformed_uncoupled{r,c};                          % pull out covariance matrix
         mat(mask)=0;                                % zero edges greater than pval
         mat(logical(eye(length(mat))))=0;           % zero the diagonal (self connections)
@@ -173,6 +173,6 @@ end
 
 
 
-save("output.mat","uncoupling_supermatrix","transformed_uncoupled","FDG_PTSM_matrix")
+save("output.mat","uncoupling_supermatrix","transformed_uncoupled","T1_T2_matrix")
 close all
 end
