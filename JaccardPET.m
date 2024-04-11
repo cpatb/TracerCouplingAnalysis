@@ -6,7 +6,7 @@ function JaccardPET(PosCovMat,NegCovMat)
 for i=2:nrP
     for j=2:ncP
         P = PosCovMat{i,j}; catP = P'; catP = catP(:)'; catP = catP.';
-        vertcatPos{i,j} = catP;
+        vertcatPos{i,j} = catP; %#ok<*AGROW>
         N = NegCovMat{i,j}; catN = N'; catN = catN(:)'; catN = catN.';
         vertcatNeg{i,j} = catN;
         for k=1:nrP
@@ -23,7 +23,7 @@ clear nrP ncP P N i j k l
 % Within sex compared to vertically adjacent time points
 for i=2:nr-1
     for j=2:nc
-        P = vertcatPos{i,j}; N = vertcatNeg{i,j};
+        P = vertcatPos{i,j}; N = vertcatNeg{i,j}; %#ok<*NASGU>
         JP(i-1,j-1) = sum(vertcatPos{i,j} & vertcatPos{i+1,j})/sum(vertcatPos{i,j} | vertcatPos{i+1,j});
         JN(i-1,j-1) = sum(vertcatNeg{i,j} & vertcatNeg{i+1,j})/sum(vertcatNeg{i,j} | vertcatNeg{i+1,j});
         Jaccard{2,2} = JP; Jaccard{2,3} = JN;
