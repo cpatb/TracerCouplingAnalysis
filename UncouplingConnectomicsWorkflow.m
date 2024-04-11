@@ -2,37 +2,36 @@
 % Load in your datasets
 % FDG Data
 load("LOAD2_HFD_FDG.mat")
-
 % PTSM Data
 load("LOAD2_HFD_PTSM.mat")
 
 %% Male Data 
 % FDG
-% 12 month LOAD2 males
-A = LOAD2_HFD_FDG{3,3};
 % 18 month LOAD2 males
-B = LOAD2_HFD_FDG{4,3};
-uncoupling_preprocessing(A,B,27)
+A = LOAD2_HFD_FDG{4,3};
+% 18 HFD month LOAD2 males
+B = LOAD2_HFD_FDG{7,3};
 
+uncoupling_preprocessing(A,B)
 load("preprocessed.mat")
-% write using data structure in function
+
 M_FDG_ref = z_ref; M_FDG_ref_mean = z_ref_mean; M_FDG_exp2ref = z_exp2ref; M_FDG_exp2ref_mean = z_exp2ref_mean; M_FDG_exp2ref_SEM = z_exp2ref_SEM;
 
-writetable(t,"Uncoupling_sharedz.xlsx","FileType","spreadsheet","UseExcel",true,"WriteRowNames",true,"WriteVariableNames",true,"Sheet","Male_12mo_18mo_FDG")
+writetable(t,"Uncoupling_18moHFD_REF_18moCD.xlsx","FileType","spreadsheet","UseExcel",true,"WriteRowNames",true,"WriteVariableNames",true,"Sheet","Male_18mo_CDvHFD_FDG")
 [rw,~] = size(t(:,2));
 for i=1:rw
-    M_FDG_sharedz_p05(i,1) = t(i,2);
+    M_FDG_sharedz_p05(i,1) = t(i,2); %#ok<*SAGROW>
 end
 M_FDG_sharedz_p05 = table2array(M_FDG_sharedz_p05);
 
 % PTSM 
 A2 = LOAD2_HFD_PTSM{3,3};
 B2 = LOAD2_HFD_PTSM{4,3};
-uncoupling_preprocessing(A2,B2,27)
+uncoupling_preprocessing(A2,B2)
 load("preprocessed.mat")
 M_PTSM_ref = z_ref; M_PTSM_ref_mean = z_ref_mean; M_PTSM_exp2ref = z_exp2ref; M_PTSM_exp2ref_mean = z_exp2ref_mean; M_PTSM_exp2ref_SEM = z_exp2ref_SEM;
 
-writetable(t,"Uncoupling_sharedz.xlsx","FileType","spreadsheet","UseExcel",true,"WriteRowNames",true,"WriteVariableNames",true,"Sheet","Male_12mo_18mo_PTSM")
+writetable(t,"Uncoupling_18moHFD_REF_18moCD.xlsx","FileType","spreadsheet","UseExcel",true,"WriteRowNames",true,"WriteVariableNames",true,"Sheet","Male_18mo_CDvHFD_PTSM")
 [rw,~] = size(t(:,2));
 for i=1:rw
     M_PTSM_sharedz_p05(i,1) = t(i,2);
@@ -49,13 +48,13 @@ end
 
 %% Female Data
 % FDG
-C = LOAD2_HFD_FDG{3,2};
-D = LOAD2_HFD_FDG{4,2};
-uncoupling_preprocessing(C,D,27)
+C = LOAD2_HFD_FDG{4,2};
+D = LOAD2_HFD_FDG{7,2};
+uncoupling_preprocessing(C,D)
 load("preprocessed.mat")
 F_FDG_ref = z_ref; F_FDG_ref_mean = z_ref_mean; F_FDG_exp2ref = z_exp2ref; F_FDG_exp2ref_mean = z_exp2ref_mean; F_FDG_exp2ref_SEM = z_exp2ref_SEM;
 
-writetable(t,"Uncoupling_sharedz.xlsx","FileType","spreadsheet","UseExcel",true,"WriteRowNames",true,"WriteVariableNames",true,"Sheet","Female_12mo_18mo_FDG")
+writetable(t,"Uncoupling_18moHFD_REF_18moCD.xlsx","FileType","spreadsheet","UseExcel",true,"WriteRowNames",true,"WriteVariableNames",true,"Sheet","Female_18mo_CDvHFD_FDG")
 
 [rw,~] = size(t(:,2));
 for i=1:rw
@@ -67,13 +66,10 @@ F_FDG_sharedz_p05 = table2array(F_FDG_sharedz_p05);
 % PTSM 
 C2 = LOAD2_HFD_PTSM{3,2};
 D2 = LOAD2_HFD_PTSM{4,2};
-uncoupling_preprocessing(C2,D2,27)
+uncoupling_preprocessing(C2,D2)
 load("preprocessed.mat")
-
 F_PTSM_ref = z_ref; F_PTSM_ref_mean = z_ref_mean; F_PTSM_exp2ref = z_exp2ref; F_PTSM_exp2ref_mean = z_exp2ref_mean; F_PTSM_exp2ref_SEM = z_exp2ref_SEM;
-
-
-writetable(t,"Uncoupling_sharedz.xlsx","FileType","spreadsheet","UseExcel",true,"WriteRowNames",true,"WriteVariableNames",true,"Sheet","Female_12mo_18mo_PTSM")
+writetable(t,"Uncoupling_18moHFD_REF_18moCD.xlsx","FileType","spreadsheet","UseExcel",true,"WriteRowNames",true,"WriteVariableNames",true,"Sheet","Female_18mo_CDvHFD_PTSM")
 
 [rw,~] = size(t(:,2));
 for i=1:rw
@@ -171,10 +167,9 @@ axis([-axis_lim_m axis_lim_m -axis_lim_m axis_lim_m])
 Xlm = xlim;
 Ylm = ylim;
 Xlb = mean(Xlm);
-Ylb = Ylm(1);
 xlabel("X-Axis: Cerebral Perfusion Z-Score Relative to Control","Position",[Xlb (Ylm(1)-.5)],"VerticalAlignment","bottom","HorizontalAlignment","center","FontSize",8);
 ylabel("Y-Axis: Cerebral Metabolic Uptake Z-Score Relative to Control","Position",[Xlm(1) mean(Ylm)],"VerticalAlignment","bottom","HorizontalAlignment","center","Rotation",90,"FontSize",8)
-legend([d],{'Male'},"Location","northwest")
+legend(d,{'Male'},"Location","northwest")
 legend('boxoff')
 
 % Female
@@ -189,10 +184,9 @@ axis([-axis_lim_f axis_lim_f -axis_lim_f axis_lim_f])
 Xlm = xlim;
 Ylm = ylim;
 Xlb = mean(Xlm);
-Ylb = .99*Ylm(1);
 xlabel("X-Axis: Cerebral Perfusion Z-Score Relative to Control","Position",[Xlb (Ylm(1)-.5)],"VerticalAlignment","bottom","HorizontalAlignment","center","FontSize",8);
 ylabel("Y-Axis: Cerebral Metabolic Uptake Z-Score Relative to Control","Position",[Xlm(1) mean(Ylm)],"VerticalAlignment","bottom","HorizontalAlignment","center","Rotation",90,"FontSize",8)
-legend([d],{'Female'},"Location","northwest")
+legend(d,{'Female'},"Location","northwest")
 legend('boxoff')
 
 
@@ -235,7 +229,13 @@ pval = 0.05;
 zdata2{1,1} = 'LOAD2 18m HFD Zscores Shared Dist'; zdata2{2,1} = 'FDG ref'; zdata2{3,1} = 'PTSM ref'; zdata2{4,1} = 'FDG exp2ref'; zdata2{5,1} = 'PTSM exp2ref'; zdata2{1,2} = 'Male'; zdata2{1,3} = 'Female';
 zdata2{2,2} = M_FDG_ref; zdata2{2,3} = F_FDG_ref; zdata2{3,2} = M_PTSM_ref; zdata2{3,3} = F_PTSM_ref; zdata2{4,2} = M_FDG_exp2ref; zdata2{4,3} = F_FDG_exp2ref; zdata2{5,2} = M_PTSM_exp2ref; zdata2{5,3} = F_PTSM_exp2ref;
 save("Uncoupling_ZData_18Mo.mat","zdata2")
-%covariance_analysis_tier1(zdata2,roi_labels,bluered_cmap,pval)
+covariance_analysis_tier1(zdata2,roi_labels,bluered_cmap,pval)
+
+%% Run isomorphic analyses using Jaccard distance as metric to see the coupling differences between PTSM and FDG
+% Load Tier1 Ouput of FDG and PTSM Shared Distribution Z-Score Data
+
+% Compute Jaccard Distance Between Graphs
+% JaccardPET(
 
 %% Run connectomics on FDG and PTSM Z-Scored Data (Independent Distributions)
 % Create new nested cell array of z-scored FDG and PTSM Data
