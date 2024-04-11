@@ -25,8 +25,8 @@ end
 M_FDG_sharedz_p05 = table2array(M_FDG_sharedz_p05);
 
 % PTSM 
-A2 = LOAD2_HFD_PTSM{3,3};
-B2 = LOAD2_HFD_PTSM{4,3};
+A2 = LOAD2_HFD_PTSM{4,3};
+B2 = LOAD2_HFD_PTSM{7,3};
 uncoupling_preprocessing(A2,B2)
 load("preprocessed.mat")
 M_PTSM_ref = z_ref; M_PTSM_ref_mean = z_ref_mean; M_PTSM_exp2ref = z_exp2ref; M_PTSM_exp2ref_mean = z_exp2ref_mean; M_PTSM_exp2ref_SEM = z_exp2ref_SEM;
@@ -64,8 +64,8 @@ end
 F_FDG_sharedz_p05 = table2array(F_FDG_sharedz_p05);
 
 % PTSM 
-C2 = LOAD2_HFD_PTSM{3,2};
-D2 = LOAD2_HFD_PTSM{4,2};
+C2 = LOAD2_HFD_PTSM{4,2};
+D2 = LOAD2_HFD_PTSM{7,2};
 uncoupling_preprocessing(C2,D2)
 load("preprocessed.mat")
 F_PTSM_ref = z_ref; F_PTSM_ref_mean = z_ref_mean; F_PTSM_exp2ref = z_exp2ref; F_PTSM_exp2ref_mean = z_exp2ref_mean; F_PTSM_exp2ref_SEM = z_exp2ref_SEM;
@@ -95,7 +95,7 @@ zscores_sharedz = [M_FDG_ref_mean; M_FDG_exp2ref_mean; F_FDG_ref_mean; F_FDG_exp
 z = array2table(zscores_sharedz,"RowNames",{'AI','AuDMV','CPu','Cg','CC','DLO','DLIVEnt','DI','ECT','Fornix','FrA','HIP','LO','MO','PtPR','PtA','PRH','PrL','M1','S1','RSC','M2','S2','TeA','TH','VO','V1V2'}, ...
     "VariableNames",{'M_FDG_REF','M_FDG_EXP2REF','F_FDG_REF','F_FDG_EXP2REF','M_PTSM_REF','M_PTSM_EXP2REF','F_PTSM_REF','F_PTSM_EXP2REF'});
 
-writetable(z,"Uncoupling_sharedz.xlsx","FileType","spreadsheet","UseExcel",true,"WriteRowNames",true,"WriteVariableNames",true,"Sheet","ZScores")
+writetable(z,"Uncoupling_18moHFD_REF_18moCD.xlsx","FileType","spreadsheet","UseExcel",true,"WriteRowNames",true,"WriteVariableNames",true,"Sheet","ZScores")
 
 %% Thresholded p-values for atlas modeler
 pvals_sharedz = [M_FDG_sharedz_p05 M_PTSM_sharedz_p05 M_Uncoupled_p05 F_FDG_sharedz_p05 F_PTSM_sharedz_p05 F_Uncoupled_p05];
@@ -127,7 +127,7 @@ clear rw cl
 z2 = array2table(pvals_sharedz_thr,"RowNames",{'AI','AuDMV','CPu','Cg','CC','DLO','DLIVEnt','DI','ECT','Fornix','FrA','HIP','LO','MO','PtPR','PtA','PRH','PrL','M1','S1','RSC','M2','S2','TeA','TH','VO','V1V2'}, ...
     "VariableNames",{'M_FDG','M_PTSM','M_Uncoupled','F_FDG','F_PTSM','F_Uncoupled'});
 
-writetable(z2,"Uncoupling_sharedz.xlsx","FileType","spreadsheet","UseExcel",true,"WriteRowNames",true,"WriteVariableNames",true,"Sheet","P-vals<0.05")
+writetable(z2,"Uncoupling_18moHFD_REF_18moCD.xlsx","FileType","spreadsheet","UseExcel",true,"WriteRowNames",true,"WriteVariableNames",true,"Sheet","P-vals<0.05")
 
 %% Visualize Uncoupling Data
 
