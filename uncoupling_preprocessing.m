@@ -1,4 +1,4 @@
-function uncoupling_preprocessing(REF,EXP,regions)
+function uncoupling_preprocessing(REF,EXP)
 
 [nrA, ncA] = size(REF);
 [nrB, ncB] = size(EXP);
@@ -42,12 +42,12 @@ end
 [z_ref_r, z_ref_c] = size(z_ref);
 [z_exp2ref_r, z_exp2ref_c] = size(z_exp2ref);
 
-if size(zref) ~= size(REF)
+if size(z_ref) ~= size(REF)
     fprintf(2,'Error - Dimensions differ between reference cohort and Z-scored transformation of reference cohort. Exiting...\n')
     return
 end
 
-if size(z_exp2ref_r) ~= size(EXP)
+if size(z_exp2ref) ~= size(EXP)
     fprintf(2,'Error - Dimensions differ between experimental cohort and Z-scored transformation of experimental cohort with respect to reference mean and stdev. Exiting...\n')
     return
 end
