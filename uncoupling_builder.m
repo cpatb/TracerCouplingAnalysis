@@ -51,7 +51,7 @@ for i=2:rT1
             fprintf(2,'Number of regions varies between tracers. Check that nested matrices were made correctly.\n')
         return
         end
-        super{i,j} = [T1_data; T2_data]; %#ok<AGROW>
+        super{i,j} = [T1_data; T2_data]; 
         supert = transpose(super{i,j});
         % Initialize the covariance supermatrix
         covariance_supermatrix = zeros(2*region_ct_T1, 2*region_ct_T1);
@@ -62,9 +62,9 @@ for i=2:rT1
                 covariance_supermatrix(o,p) = corr(supert(:,o), supert(:,p),"type","Pearson");
             end
         end
-        uncoupling_supermatrix{i,j} = covariance_supermatrix; %#ok<AGROW>
+        uncoupling_supermatrix{i,j} = covariance_supermatrix; 
         clear covariance_supermatrix
-        uncoupling_supermatrix{1,j} = T1{1,j}; %#ok<AGROW>
+        uncoupling_supermatrix{1,j} = T1{1,j}; 
         
     end
     uncoupling_supermatrix{i,1} = T1{i,1}; 
@@ -89,8 +89,8 @@ for i=2:rw_super
         fullsuper = uncoupling_supermatrix{i,j}; T1_T1 = fullsuper(1:rowlim_T1_T1, 1:collim_T1_T1);
         T1_T2 = fullsuper(rowlim_T1_T1+1:rowlim_T1_T2, 1:collim_T1_T2);
         T2_T2 = fullsuper(rowlim_T1_T1+1:rowlim_T2_T2, collim_T1_T1+1:collim_T2_T2);
-        T1_T1_matrix{i,j} = T1_T1; T1_T2_matrix{i,j} = T1_T2; T2_T2_matrix{i,j} = T2_T2; %#ok<AGROW>
-        T1_T1_matrix(1,j) = uncoupling_supermatrix(1,j);T1_T2_matrix(1,j) = uncoupling_supermatrix(1,j); T2_T2_matrix(1,j) = uncoupling_supermatrix(1,j); %#ok<AGROW>
+        T1_T1_matrix{i,j} = T1_T1; T1_T2_matrix{i,j} = T1_T2; T2_T2_matrix{i,j} = T2_T2; 
+        T1_T1_matrix(1,j) = uncoupling_supermatrix(1,j);T1_T2_matrix(1,j) = uncoupling_supermatrix(1,j); T2_T2_matrix(1,j) = uncoupling_supermatrix(1,j); 
     end
     T1_T1_matrix(i,1) = uncoupling_supermatrix(i,1); T1_T1_matrix{1,1} = T1{1,1};
     T1_T2_matrix(i,1) = uncoupling_supermatrix(i,1); T1_T2_matrix{1,1} = "Coupled";
@@ -101,8 +101,8 @@ end
 [rw_uNcT2ld,cl_uNcT2ld] = size(T1_T2_matrix);
 for i=2:rw_uNcT2ld
     for j=2:cl_uNcT2ld
-        transformed_uncoupled{i,j} = T1_T2_matrix{i,j}*-1; %#ok<AGROW>
-        transformed_uncoupled{1,j} = T1_T2_matrix{1,j}; %#ok<AGROW>
+        transformed_uncoupled{i,j} = T1_T2_matrix{i,j}*-1; 
+        transformed_uncoupled{1,j} = T1_T2_matrix{1,j}; 
     end
     transformed_uncoupled{i,1} = T1_T2_matrix{i,1}; transformed_uncoupled{1,1} = "Transformed + Coupled";
 end
@@ -123,7 +123,7 @@ for i=2:rw_perm
     for j=2:cl_perm
         fullsuper = cov_permP{i,j}; 
         T1_T2 = fullsuper(rowlim_T1_T1+1:rowlim_T1_T2, 1:collim_T1_T2);
-        T1_T2_perm_matrix{i,j} = T1_T2;
+        T1_T2_perm_matrix{i,j} = T1_T2; %#ok<*AGROW>
         T1_T2_perm_matrix(1,j) = uncoupling_supermatrix(1,j);
     end
     T1_T2_perm_matrix(i,1) = uncoupling_supermatrix(i,1); T1_T2_perm_matrix{1,1} = "Coupled";
@@ -151,7 +151,7 @@ N = length(roi_labels);
 for i=2:rw_transformed
     for j=2:cl_transformed
         matrix = transformed_uncoupled{i,j};
-        [agrMat, mrccPartition,allPartitions] = mrcc_wrapper(matrix*-1,10000,1,roi_labels);
+        [~, mrccPartition,~] = mrcc_wrapper(matrix*-1,10000,1,roi_labels);
         mrccPartition = fcn_relabel_partitions(mrccPartition);
         [X,Y,idx_ord]=grid_communities(mrccPartition);
         f(i,j)= figure('units','inches','position',[1 1 6 6],'paperpositionmode','auto');
