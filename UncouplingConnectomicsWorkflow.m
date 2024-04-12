@@ -231,11 +231,10 @@ zdata2{2,2} = M_FDG_ref; zdata2{2,3} = F_FDG_ref; zdata2{3,2} = M_PTSM_ref; zdat
 save("Uncoupling_ZData_18Mo.mat","zdata2")
 covariance_analysis_tier1(zdata2,roi_labels,bluered_cmap,pval)
 
-%% Run isomorphic analyses using Jaccard distance as metric to see the coupling differences between PTSM and FDG
+%% Run isomorphic analyses using Jaccard distance as metric to quantify coupling differences
 % Load Tier1 Ouput of FDG and PTSM Shared Distribution Z-Score Data
 
 % Compute Jaccard Distance Between Graphs
-% JaccardPET(
 
 %% Run connectomics on FDG and PTSM Z-Scored Data (Independent Distributions)
 % Create new nested cell array of z-scored FDG and PTSM Data
